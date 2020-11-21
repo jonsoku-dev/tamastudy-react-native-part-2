@@ -4,14 +4,14 @@ import GlobalStyles from '../styles/GlobalStyles';
 
 interface Props {}
 
-const DetailScreen: FunctionComponent<Props> = () => {
+const MyInfoScreen: FunctionComponent<Props> = () => {
   return (
     <SafeAreaView style={GlobalStyles.androidSafeArea}>
       <View>
-        <Text>Detail Screen</Text>
+        <Text>MyInfo Screen</Text>
       </View>
     </SafeAreaView>
   );
 };
 
-export default DetailScreen;
+export default MyInfoScreen;
