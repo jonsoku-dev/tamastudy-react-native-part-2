@@ -10,7 +10,7 @@ interface Props {}
 const HomeScreen: FunctionComponent<Props> = () => {
   return (
     <SafeAreaView style={GlobalStyles.androidSafeArea}>
-      <StatusWrapper />
+      <StatusWrapper totalKcal={2000} currentKcal={900} />
       <MenuWrapper />
       <RecordWrapper />
     </SafeAreaView>
