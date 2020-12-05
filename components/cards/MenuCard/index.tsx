@@ -3,15 +3,21 @@ import { View, Text, StyleSheet, Platform, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { AddIcon, TrashIcon } from '../../icons';
+import { IBoard } from '../../../contexts/useBoardContext';
 
 interface Props {
-  title: '아침' | '점심' | '저녁';
-  name: string;
-  kcal: number;
-  date: string;
+  type: IBoard['type'];
+  title: IBoard['title'];
+  calorie: IBoard['calorie'];
+  createdAt: IBoard['createdAt'];
 }
 
-const MenuCard: FunctionComponent<Props> = ({ title, name, kcal, date }) => {
+const MenuCard: FunctionComponent<Props> = ({
+  type,
+  title,
+  calorie,
+  createdAt,
+}) => {
   const [image, setImage] = useState<string | null>(null);
 
   const callPermission = async () => {
@@ -51,7 +57,7 @@ const MenuCard: FunctionComponent<Props> = ({ title, name, kcal, date }) => {
     <View style={styles.cardWrapper}>
       {/* Title */}
       <View style={styles.cardTitle}>
-        <Text style={styles.cardTitleText}>{title}</Text>
+        <Text style={styles.cardTitleText}>{type}</Text>
       </View>
       {/* Content */}
       <View style={styles.cardContent}>
@@ -81,9 +87,9 @@ const MenuCard: FunctionComponent<Props> = ({ title, name, kcal, date }) => {
           </TouchableOpacity>
         )}
         <View style={styles.cardContentInfo}>
-          <Text>{name}</Text>
-          <Text>{kcal} kcal</Text>
-          <Text>{date}</Text>
+          <Text>{title}</Text>
+          <Text>{calorie} kcal</Text>
+          <Text>{createdAt}</Text>
         </View>
       </View>
     </View>

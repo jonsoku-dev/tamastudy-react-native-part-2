@@ -5,8 +5,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './screens/HomeScreen';
 import MyInfoScreen from './screens/MyInfoScreen';
 import MapScreen from './screens/MapScreen';
-
 import * as Icons from './components/icons';
+import { initDatabase } from './db/utils';
+import { BoardProvider } from './contexts/useBoardContext';
 
 const Tab = createBottomTabNavigator();
 
@@ -43,10 +44,16 @@ const MyTabs = () => (
 );
 
 const App = () => {
+  React.useEffect(() => {
+    initDatabase();
+  }, []);
+
   return (
-    <NavigationContainer>
-      <MyTabs />
-    </NavigationContainer>
+    <BoardProvider>
+      <NavigationContainer>
+        <MyTabs />
+      </NavigationContainer>
+    </BoardProvider>
   );
 };
 
