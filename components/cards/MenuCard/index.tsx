@@ -31,7 +31,7 @@ const MenuCard: FunctionComponent<Props> = ({
   image,
 }) => {
   /**
-   * hook
+   * custom hook
    */
   const { createBoard } = useBoardContext();
 
@@ -42,32 +42,6 @@ const MenuCard: FunctionComponent<Props> = ({
   const [updateTitle, setUpdateTitle] = useState('');
   const [updateCalorie, setUpdateCalorie] = useState(0);
   const [editMode, setEditMode] = useState(false);
-
-  const callPermission = async () => {
-    if (Platform.OS !== 'web') {
-      const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
-      if (status !== 'granted') {
-        alert('권한이 없습니다.');
-      }
-    }
-  };
-
-  const onClickAddImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setUploadImage(result.uri);
-    }
-  };
-
-  const onClickRemoveImage = () => {
-    setUploadImage(null);
-  };
 
   /**
    * handle function
@@ -97,6 +71,36 @@ const MenuCard: FunctionComponent<Props> = ({
       },
       onClickCancelButton
     );
+  };
+
+  const onClickAddImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setUploadImage(result.uri);
+    }
+  };
+
+  const onClickRemoveImage = () => {
+    setUploadImage(null);
+  };
+
+  /**
+   * useEffect
+   */
+
+  const callPermission = async () => {
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
+      if (status !== 'granted') {
+        alert('권한이 없습니다.');
+      }
+    }
   };
 
   useEffect(() => {
