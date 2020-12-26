@@ -1,29 +1,51 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Platform, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Image,
+  TouchableOpacity,
+  Button,
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { AddIcon, TrashIcon } from '../../icons';
-import { IBoard } from '../../../contexts/useBoardContext';
+import { IBoard, useBoardContext } from '../../../contexts/useBoardContext';
+import { TextInput } from 'react-native-gesture-handler';
 
 interface Props {
   type: IBoard['type'];
   title: IBoard['title'];
   calorie: IBoard['calorie'];
-  createdAt: IBoard['createdAt'];
+  createdDate?: IBoard['createdDate'];
+  date?: IBoard['date'];
+  image?: IBoard['image'];
 }
 
 const MenuCard: FunctionComponent<Props> = ({
   type,
   title,
   calorie,
-  createdAt,
+  createdDate,
+  date,
+  image,
 }) => {
-  const [image, setImage] = useState<string | null>(null);
+  /**
+   * hook
+   */
+  const { createBoard } = useBoardContext();
+
+  /**
+   * state
+   */
+  const [uploadImage, setUploadImage] = useState<any>(null);
+  const [updateTitle, setUpdateTitle] = useState('');
+  const [updateCalorie, setUpdateCalorie] = useState(0);
+  const [editMode, setEditMode] = useState(false);
 
   const callPermission = async () => {
     if (Platform.OS !== 'web') {
       const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
-      console.log(status);
       if (status !== 'granted') {
         alert('권한이 없습니다.');
       }
@@ -38,20 +60,56 @@ const MenuCard: FunctionComponent<Props> = ({
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.cancelled) {
-      setImage(result.uri);
+      setUploadImage(result.uri);
     }
   };
 
   const onClickRemoveImage = () => {
-    setImage(null);
+    setUploadImage(null);
+  };
+
+  /**
+   * handle function
+   */
+  const handleChangeTitle = (title: string) => {
+    setUpdateTitle(title);
+  };
+
+  const handleChangeCalorie = (calorie: string) => {
+    setUpdateCalorie(+calorie);
+  };
+
+  /**
+   * click function
+   */
+  const onClickCancelButton = () => {
+    setEditMode(false);
+  };
+
+  const onClickSaveButton = () => {
+    // update query ~
+    createBoard(
+      {
+        title: updateTitle,
+        calorie: updateCalorie,
+        type,
+      },
+      onClickCancelButton
+    );
   };
 
   useEffect(() => {
     callPermission();
   }, []);
+
+  useEffect(() => {
+    if (image) {
+      setUploadImage(image);
+      setUpdateTitle(title);
+      setUpdateCalorie(calorie);
+    }
+  }, [image, title, calorie]);
 
   return (
     <View style={styles.cardWrapper}>
@@ -61,11 +119,11 @@ const MenuCard: FunctionComponent<Props> = ({
       </View>
       {/* Content */}
       <View style={styles.cardContent}>
-        {image ? (
+        {uploadImage ? (
           <View style={styles.cardImageBox}>
             <TouchableOpacity onPress={onClickAddImage}>
               <Image
-                source={{ uri: image }}
+                source={{ uri: uploadImage }}
                 style={{ width: 160, height: 160 }}
               ></Image>
             </TouchableOpacity>
@@ -86,11 +144,37 @@ const MenuCard: FunctionComponent<Props> = ({
             </View>
           </TouchableOpacity>
         )}
-        <View style={styles.cardContentInfo}>
-          <Text>{title}</Text>
-          <Text>{calorie} kcal</Text>
-          <Text>{createdAt}</Text>
-        </View>
+        {editMode ? (
+          <View style={styles.cardContentInfo}>
+            <TextInput
+              style={[styles.baseInput]}
+              value={updateTitle}
+              onChangeText={handleChangeTitle}
+            ></TextInput>
+            <TextInput
+              keyboardType={'number-pad'}
+              style={[styles.baseInput]}
+              value={String(updateCalorie)}
+              onChangeText={handleChangeCalorie}
+            ></TextInput>
+            <View style={styles.inputButtonBox}>
+              <Button onPress={onClickSaveButton} title={'저장하기'} />
+              <Button
+                onPress={onClickCancelButton}
+                title={'취소하기'}
+                color={'red'}
+              />
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity onPress={() => setEditMode(true)}>
+            <View style={styles.cardContentInfo}>
+              <Text>{title}</Text>
+              <Text>{calorie} kcal</Text>
+              <Text>{createdDate}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -130,6 +214,14 @@ const styles = StyleSheet.create({
   },
   cardContentImageText: {
     marginTop: 16,
+  },
+  baseInput: {
+    borderWidth: 1,
+    borderColor: 'black',
+  },
+  inputButtonBox: {
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
 });
 
