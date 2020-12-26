@@ -2,14 +2,15 @@ import React, { FunctionComponent } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { useBoardContext } from '../../../contexts/useBoardContext';
 import MenuCard from '../../cards/MenuCard';
+import getDate from '../../../utils/getDate';
 
 interface Props {}
 
 const MenuWrapper: FunctionComponent<Props> = () => {
-  const { boards, insertDummyData, findBoardsByDate } = useBoardContext();
+  const { boards, findBoardsByDate } = useBoardContext();
 
   React.useEffect(() => {
-    findBoardsByDate(20201205);
+    findBoardsByDate(getDate());
   }, []);
 
   /**
@@ -21,7 +22,6 @@ const MenuWrapper: FunctionComponent<Props> = () => {
 
   return (
     <View>
-      <Button onPress={insertDummyData} title={'insert dummy data'} />
       <View>
         <MenuCard
           title={morning?.title ?? '타이틀을 입력해주세요. '}
