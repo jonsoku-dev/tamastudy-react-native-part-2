@@ -33,7 +33,7 @@ const MenuCard: FunctionComponent<Props> = ({
   /**
    * custom hook
    */
-  const { createBoard, updateBoard } = useBoardContext();
+  const { createBoard, updateBoard, deleteBoard } = useBoardContext();
 
   /**
    * state
@@ -101,6 +101,19 @@ const MenuCard: FunctionComponent<Props> = ({
     setUploadImage(null);
   };
 
+  const onClickDelete = (date: IBoard['date'], type: IBoard['type']) => () => {
+
+    setUpdateTitle('');
+    setUpdateCalorie(0);
+
+    deleteBoard({
+        date,
+        type,
+      },
+      onClickCancelButton,
+    );
+  };
+
   /**
    * useEffect
    */
@@ -131,6 +144,13 @@ const MenuCard: FunctionComponent<Props> = ({
       {/* Title */}
       <View style={styles.cardTitle}>
         <Text style={styles.cardTitleText}>{type}</Text>
+        {date && (
+          <TouchableOpacity onPress={onClickDelete(date, type)}>
+            <Text style={{ color: 'red' }}>
+              DELETE
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
       {/* Content */}
       <View style={styles.cardContent}>

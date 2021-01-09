@@ -36,12 +36,19 @@ export interface IDeleteBoard {
   type: IBoard['type'];
 }
 
+export interface IUpdateBoardImage {
+  image: IBoard['image'];
+  date: IBoard['date'];
+  type: IBoard['type'];
+}
+
 export interface IBoardContext {
   boards: IBoard[];
   findBoardsByDate: (date: number) => void;
   createBoard: ({ title, calorie, type }: ICreateBoard, cb: Function) => void;
   updateBoard: ({ title, calorie, date, type }: IUpdateBoard, cb: Function) => void;
   deleteBoard: ({ date, type }: IDeleteBoard, cb: Function) => void;
+  updateBoardImage: ({ image, date, type }: IUpdateBoardImage, cb: Function) => void;
 }
 
 const BoardContext = createContext<IBoardContext>({} as IBoardContext);
@@ -123,7 +130,7 @@ export const BoardProvider: FunctionComponent<any> = ({ children }) => {
     cb: Function,
   ) => {
     const DELETE_BOARD =
-      'DELETE boards FROM WHERE boards.date = ? AND boards.type = ?';
+      'DELETE FROM boards WHERE boards.date = ? AND boards.type = ?';
 
     db.transaction((tx) => {
       tx.executeSql(
@@ -144,12 +151,40 @@ export const BoardProvider: FunctionComponent<any> = ({ children }) => {
     });
   };
 
+  const updateBoardImage = (
+    { image, date, type }: IUpdateBoardImage,
+    cb: Function,
+  ) => {
+    const UPDATE_BOARD_IMAGE =
+      'UPDATE boards SET image = ? WHERE boards.date = ? AND boards.type = ?';
+
+    db.transaction((tx) => {
+      // 초기 board 생성
+      tx.executeSql(
+        UPDATE_BOARD_IMAGE,
+        [image, date, type],
+        () => {
+          tx.executeSql(
+            'SELECT * FROM boards where boards.date = ?',
+            [date, type],
+            (_: any, { rows }: any) => {
+              setBoards(rows._array);
+              console.log(rows._array);
+              cb();
+            },
+          );
+        },
+      );
+    });
+  };
+
   const store: IBoardContext = {
     boards,
     findBoardsByDate,
     createBoard,
     updateBoard,
-    deleteBoard
+    deleteBoard,
+    updateBoardImage
   };
   return (
     <BoardContext.Provider value={store}>{children}</BoardContext.Provider>
