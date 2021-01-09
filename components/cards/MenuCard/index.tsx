@@ -23,17 +23,17 @@ interface Props {
 }
 
 const MenuCard: FunctionComponent<Props> = ({
-  type,
-  title,
-  calorie,
-  createdDate,
-  date,
-  image,
-}) => {
+                                              type,
+                                              title,
+                                              calorie,
+                                              createdDate,
+                                              date,
+                                              image,
+                                            }) => {
   /**
    * custom hook
    */
-  const { createBoard } = useBoardContext();
+  const { createBoard, updateBoard } = useBoardContext();
 
   /**
    * state
@@ -62,15 +62,26 @@ const MenuCard: FunctionComponent<Props> = ({
   };
 
   const onClickSaveButton = () => {
-    // update query ~
-    createBoard(
-      {
-        title: updateTitle,
-        calorie: updateCalorie,
-        type,
-      },
-      onClickCancelButton
-    );
+    if (date) {
+      updateBoard(
+        {
+          title: updateTitle,
+          calorie: updateCalorie,
+          type,
+          date: date,
+        },
+        onClickCancelButton,
+      );
+    } else {
+      createBoard(
+        {
+          title: updateTitle,
+          calorie: updateCalorie,
+          type,
+        },
+        onClickCancelButton,
+      );
+    }
   };
 
   const onClickAddImage = async () => {

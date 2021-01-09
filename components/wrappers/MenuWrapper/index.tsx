@@ -28,6 +28,7 @@ const MenuWrapper: FunctionComponent<Props> = () => {
           type={morning?.type ?? 'morning'}
           calorie={morning?.calorie ?? 0}
           image={morning?.image}
+          date={morning?.date}
         />
       </View>
       <View>
@@ -36,6 +37,7 @@ const MenuWrapper: FunctionComponent<Props> = () => {
           type={lunch?.type ?? 'lunch'}
           calorie={lunch?.calorie ?? 0}
           image={lunch?.image}
+          date={lunch?.date}
         />
       </View>
       <View>
@@ -44,6 +46,7 @@ const MenuWrapper: FunctionComponent<Props> = () => {
           type={dinner?.type ?? 'dinner'}
           calorie={dinner?.calorie ?? 0}
           image={dinner?.image}
+          date={dinner?.date}
         />
       </View>
     </View>
