@@ -33,7 +33,7 @@ const MenuCard: FunctionComponent<Props> = ({
   /**
    * custom hook
    */
-  const { createBoard, updateBoard, deleteBoard } = useBoardContext();
+  const { createBoard, updateBoard, deleteBoard, updateBoardImage, deleteBoardImage } = useBoardContext();
 
   /**
    * state
@@ -62,26 +62,22 @@ const MenuCard: FunctionComponent<Props> = ({
   };
 
   const onClickSaveButton = () => {
-    if (date) {
-      updateBoard(
-        {
-          title: updateTitle,
-          calorie: updateCalorie,
-          type,
-          date: date,
-        },
-        onClickCancelButton,
-      );
-    } else {
-      createBoard(
-        {
-          title: updateTitle,
-          calorie: updateCalorie,
-          type,
-        },
-        onClickCancelButton,
-      );
-    }
+    date ? updateBoard(
+      {
+        title: updateTitle,
+        calorie: updateCalorie,
+        type,
+        date: date,
+      },
+      onClickCancelButton,
+    ) : createBoard(
+      {
+        title: updateTitle,
+        calorie: updateCalorie,
+        type,
+      },
+      onClickCancelButton,
+    );
   };
 
   const onClickAddImage = async () => {
@@ -94,17 +90,36 @@ const MenuCard: FunctionComponent<Props> = ({
 
     if (!result.cancelled) {
       setUploadImage(result.uri);
+      if (date) {
+        updateBoardImage({
+            date,
+            image: result.uri,
+            type,
+          },
+          onClickCancelButton,
+        );
+      } else {
+        createBoard({
+            title: '타이틀을 입력해주세요.', // "타이틀을 입력해주세요."
+            calorie: updateCalorie, // 0
+            image: result.uri,
+            type, // morning, lunch, dinner
+          },
+          onClickCancelButton);
+      }
     }
   };
 
   const onClickRemoveImage = () => {
-    setUploadImage(null);
+    if (date) {
+      deleteBoardImage({ date, type }, onClickCancelButton);
+      setUploadImage(null);
+    }
   };
 
   const onClickDelete = (date: IBoard['date'], type: IBoard['type']) => () => {
 
-    setUpdateTitle('');
-    setUpdateCalorie(0);
+    clearState();
 
     deleteBoard({
         date,
@@ -112,6 +127,15 @@ const MenuCard: FunctionComponent<Props> = ({
       },
       onClickCancelButton,
     );
+  };
+
+  /**
+   * util function
+   */
+  const clearState = () => {
+    setUpdateTitle('');
+    setUpdateCalorie(0);
+    setUploadImage(null);
   };
 
   /**

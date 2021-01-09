@@ -24,7 +24,7 @@ const MenuWrapper: FunctionComponent<Props> = () => {
     <View>
       <View>
         <MenuCard
-          title={morning?.title ?? '타이틀을 입력해주세요. '}
+          title={morning?.title ?? '타이틀을 입력해주세요.'}
           type={morning?.type ?? 'morning'}
           calorie={morning?.calorie ?? 0}
           image={morning?.image}

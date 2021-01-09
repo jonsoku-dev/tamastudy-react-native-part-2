@@ -22,6 +22,7 @@ export interface ICreateBoard {
   title: IBoard['title'];
   calorie: IBoard['calorie'];
   type: IBoard['type'];
+  image?: IBoard['image'];
 }
 
 export interface IUpdateBoard {
@@ -42,6 +43,11 @@ export interface IUpdateBoardImage {
   type: IBoard['type'];
 }
 
+export interface IDeleteBoardImage {
+  date: IBoard['date'];
+  type: IBoard['type'];
+}
+
 export interface IBoardContext {
   boards: IBoard[];
   findBoardsByDate: (date: number) => void;
@@ -49,6 +55,7 @@ export interface IBoardContext {
   updateBoard: ({ title, calorie, date, type }: IUpdateBoard, cb: Function) => void;
   deleteBoard: ({ date, type }: IDeleteBoard, cb: Function) => void;
   updateBoardImage: ({ image, date, type }: IUpdateBoardImage, cb: Function) => void;
+  deleteBoardImage: ({ date, type }: IDeleteBoardImage, cb: Function) => void;
 }
 
 const BoardContext = createContext<IBoardContext>({} as IBoardContext);
@@ -69,7 +76,7 @@ export const BoardProvider: FunctionComponent<any> = ({ children }) => {
   }, []);
 
   const createBoard = (
-    { title, calorie, type }: ICreateBoard,
+    { title, calorie, type, image }: ICreateBoard,
     cb: Function,
   ) => {
     const CREATE_BOARD =
@@ -81,7 +88,7 @@ export const BoardProvider: FunctionComponent<any> = ({ children }) => {
       // 초기 board 생성
       tx.executeSql(
         CREATE_BOARD,
-        [title, calorie, createdDate, date, type, null],
+        [title, calorie, createdDate, date, type, image ?? null],
         () => {
           // 생성 후 해당 date로 조회
           tx.executeSql(
@@ -178,13 +185,40 @@ export const BoardProvider: FunctionComponent<any> = ({ children }) => {
     });
   };
 
+  const deleteBoardImage = (
+    { date, type }: IDeleteBoardImage,
+    cb: Function,
+  ) => {
+    const UPDATE_BOARD_IMAGE =
+      'UPDATE boards SET image = ? WHERE boards.date = ? AND boards.type = ?';
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        UPDATE_BOARD_IMAGE,
+        [null, date, type],
+        () => {
+          tx.executeSql(
+            'SELECT * FROM boards where boards.date = ?',
+            [date, type],
+            (_: any, { rows }: any) => {
+              setBoards(rows._array);
+              console.log(rows._array);
+              cb();
+            },
+          );
+        },
+      );
+    });
+  };
+
   const store: IBoardContext = {
     boards,
     findBoardsByDate,
     createBoard,
     updateBoard,
     deleteBoard,
-    updateBoardImage
+    updateBoardImage,
+    deleteBoardImage
   };
   return (
     <BoardContext.Provider value={store}>{children}</BoardContext.Provider>
