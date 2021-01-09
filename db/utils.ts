@@ -14,7 +14,7 @@ const CREATE_TABLE_SQL =
    6. type (morning, lunch, dinner )
    7. image
    */
-  'CREATE TABLE IF NOT EXISTS boards (id integer primary key autoincrement, title varchar, calorie int, created_date timestamp, date int, type varchar, image varchar);';
+  'CREATE TABLE IF NOT EXISTS boards (id integer primary key autoincrement, title varchar, calorie int, created_date timestamp, date varchar, type varchar, image varchar);';
 
 // function
 export const initDatabase = () => {

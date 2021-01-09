@@ -7,6 +7,8 @@ import React, {
 } from 'react';
 import { db } from '../db/utils';
 import getDate from '../utils/getDate';
+import moment, { Moment } from 'moment';
+import { DATE_FORMAT } from '../shared/enums';
 
 export interface IBoard {
   id: number;
@@ -15,7 +17,7 @@ export interface IBoard {
   title: string;
   calorie: number;
   createdDate: number;
-  date: number;
+  date: string;
 }
 
 export interface ICreateBoard {
@@ -50,12 +52,15 @@ export interface IDeleteBoardImage {
 
 export interface IBoardContext {
   boards: IBoard[];
-  findBoardsByDate: (date: number) => void;
+  findBoardsByDate: (date: string) => void;
   createBoard: ({ title, calorie, type }: ICreateBoard, cb: Function) => void;
   updateBoard: ({ title, calorie, date, type }: IUpdateBoard, cb: Function) => void;
   deleteBoard: ({ date, type }: IDeleteBoard, cb: Function) => void;
   updateBoardImage: ({ image, date, type }: IUpdateBoardImage, cb: Function) => void;
   deleteBoardImage: ({ date, type }: IDeleteBoardImage, cb: Function) => void;
+  selectedStartDate: Moment
+  currentDate: string
+  onDateChange: (date: Moment, type: 'START_DATE' | 'END_DATE') => void;
 }
 
 const BoardContext = createContext<IBoardContext>({} as IBoardContext);
@@ -63,7 +68,7 @@ const BoardContext = createContext<IBoardContext>({} as IBoardContext);
 export const BoardProvider: FunctionComponent<any> = ({ children }) => {
   const [boards, setBoards] = useState<IBoard[]>([]);
 
-  const findBoardsByDate = useCallback((date: number) => {
+  const findBoardsByDate = useCallback((date: string) => {
     db.transaction((tx) => {
       tx.executeSql(
         'SELECT * FROM boards where boards.date = ?',
@@ -82,8 +87,8 @@ export const BoardProvider: FunctionComponent<any> = ({ children }) => {
     const CREATE_BOARD =
       'INSERT INTO boards (title, calorie, created_date, date, type, image) values (?, ?, ?, ?, ?, ?)';
 
-    const createdDate = +new Date().getTime();
-    const date = getDate();
+    const createdDate = moment().unix()
+    const date = moment().format(DATE_FORMAT)
     db.transaction((tx) => {
       // 초기 board 생성
       tx.executeSql(
@@ -212,7 +217,13 @@ export const BoardProvider: FunctionComponent<any> = ({ children }) => {
   };
 
   //
+  const [selectedStartDate, setSelectedStartDate] = useState<Moment>(moment());
+  const [currentDate, setCurrentDate] = useState(moment().format(DATE_FORMAT))
 
+  const onDateChange = (date: Moment, type: 'START_DATE' | 'END_DATE') => {
+    setSelectedStartDate(date);
+    setCurrentDate(date.format(DATE_FORMAT))
+  };
 
 
   const store: IBoardContext = {
@@ -222,7 +233,11 @@ export const BoardProvider: FunctionComponent<any> = ({ children }) => {
     updateBoard,
     deleteBoard,
     updateBoardImage,
-    deleteBoardImage
+    deleteBoardImage,
+    //
+    selectedStartDate,
+    currentDate,
+    onDateChange
   };
   return (
     <BoardContext.Provider value={store}>{children}</BoardContext.Provider>

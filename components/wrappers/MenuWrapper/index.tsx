@@ -7,11 +7,11 @@ import getDate from '../../../utils/getDate';
 interface Props {}
 
 const MenuWrapper: FunctionComponent<Props> = () => {
-  const { boards, findBoardsByDate } = useBoardContext();
+  const { boards, findBoardsByDate, currentDate } = useBoardContext();
 
   React.useEffect(() => {
-    findBoardsByDate(getDate());  // getDate() : 2021109
-  }, []);
+    findBoardsByDate(currentDate);
+  }, [currentDate]);
 
   /**
    * 무시해도됨. 원래는 이렇게 안함....

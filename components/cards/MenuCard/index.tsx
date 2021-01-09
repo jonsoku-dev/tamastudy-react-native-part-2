@@ -156,11 +156,9 @@ const MenuCard: FunctionComponent<Props> = ({
   }, []);
 
   useEffect(() => {
-    if (image) {
-      setUploadImage(image);
-      setUpdateTitle(title);
-      setUpdateCalorie(calorie);
-    }
+    setUploadImage(image);
+    setUpdateTitle(title);
+    setUpdateCalorie(calorie);
   }, [image, title, calorie]);
 
   return (
