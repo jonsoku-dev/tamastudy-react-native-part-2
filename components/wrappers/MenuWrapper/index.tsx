@@ -10,7 +10,7 @@ const MenuWrapper: FunctionComponent<Props> = () => {
   const { boards, findBoardsByDate } = useBoardContext();
 
   React.useEffect(() => {
-    findBoardsByDate(getDate());
+    findBoardsByDate(getDate());  // getDate() : 2021109
   }, []);
 
   /**
