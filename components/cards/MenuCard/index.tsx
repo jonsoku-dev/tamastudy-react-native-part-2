@@ -1,17 +1,10 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Platform,
-  Image,
-  TouchableOpacity,
-  Button,
-} from 'react-native';
+import React, { FunctionComponent, useEffect, useState } from 'react';
+import { Platform, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { AddIcon, TrashIcon } from '../../icons';
-import { IBoard, useBoardContext } from '../../../contexts/useBoardContext';
-import { TextInput } from 'react-native-gesture-handler';
+import { useBoardContext } from '../../../contexts/useBoardContext';
+import { IBoard } from '../../../interfaces/IBoard';
+import * as S from './styled';
 
 interface Props {
   type: IBoard['type'];
@@ -162,124 +155,76 @@ const MenuCard: FunctionComponent<Props> = ({
   }, [image, title, calorie]);
 
   return (
-    <View style={styles.cardWrapper}>
+    <S.Wrapper>
       {/* Title */}
-      <View style={styles.cardTitle}>
-        <Text style={styles.cardTitleText}>{type}</Text>
+      <S.TitleBox>
+        <S.TitleText>{type}</S.TitleText>
         {date && (
           <TouchableOpacity onPress={onClickDelete(date, type)}>
-            <Text style={{ color: 'red' }}>
+            <S.DeleteButtonText>
               DELETE
-            </Text>
+            </S.DeleteButtonText>
           </TouchableOpacity>
         )}
-      </View>
+      </S.TitleBox>
       {/* Content */}
-      <View style={styles.cardContent}>
+      <S.ContentBox>
         {uploadImage ? (
-          <View style={styles.cardImageBox}>
+          <S.ContentImageBox>
             <TouchableOpacity onPress={onClickAddImage}>
-              <Image
+              <S.ContentImage
                 source={{ uri: uploadImage }}
-                style={{ width: 160, height: 160 }}
-              ></Image>
+              />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.cardRemoveIcon}
               onPress={onClickRemoveImage}
             >
-              <TrashIcon size={14} color={'#fff'} />
+              <S.ContentTrash>
+                <TrashIcon size={20} color={'#fff'} />
+              </S.ContentTrash>
             </TouchableOpacity>
-          </View>
+          </S.ContentImageBox>
         ) : (
           <TouchableOpacity onPress={onClickAddImage}>
-            <View style={styles.cardContentImage}>
+            <S.ContentEmptyImageBox>
               <AddIcon />
-              <Text style={styles.cardContentImageText}>
+              <S.EmptyImageText>
                 사진을 등록해주세요.
-              </Text>
-            </View>
+              </S.EmptyImageText>
+            </S.ContentEmptyImageBox>
           </TouchableOpacity>
         )}
-        {editMode ? (
-          <View style={styles.cardContentInfo}>
-            <TextInput
-              style={[styles.baseInput]}
-              value={updateTitle}
-              onChangeText={handleChangeTitle}
-            ></TextInput>
-            <TextInput
-              keyboardType={'number-pad'}
-              style={[styles.baseInput]}
-              value={String(updateCalorie)}
-              onChangeText={handleChangeCalorie}
-            ></TextInput>
-            <View style={styles.inputButtonBox}>
-              <Button onPress={onClickSaveButton} title={'저장하기'} />
-              <Button
-                onPress={onClickCancelButton}
-                title={'취소하기'}
-                color={'red'}
+        <S.DetailBox>
+          {editMode ? (
+            <S.DetailForm>
+              <S.DetailFormInput
+                value={updateTitle}
+                onChangeText={handleChangeTitle}
               />
-            </View>
-          </View>
-        ) : (
-          <TouchableOpacity onPress={() => setEditMode(true)}>
-            <View style={styles.cardContentInfo}>
-              <Text>{title}</Text>
-              <Text>{calorie} kcal</Text>
-              <Text>{createdDate}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
+              <S.DetailFormInput
+                keyboardType={'number-pad'}
+                value={String(updateCalorie)}
+                onChangeText={handleChangeCalorie}
+              />
+              <S.DetailButtonBox>
+                <S.DetailButton onPress={onClickSaveButton} title={'저장하기'} />
+                <S.DetailCancelButton
+                  onPress={onClickCancelButton}
+                  title={'취소하기'}
+                  color={'red'}
+                />
+              </S.DetailButtonBox>
+            </S.DetailForm>
+          ) : (
+            <TouchableOpacity onPress={() => setEditMode(true)}>
+              <S.DetailTitleText>{title}</S.DetailTitleText>
+              <S.DetailCalorieText>{calorie} kcal</S.DetailCalorieText>
+            </TouchableOpacity>
+          )}
+        </S.DetailBox>
+      </S.ContentBox>
+    </S.Wrapper>
   );
 };
-
-const styles = StyleSheet.create({
-  cardWrapper: {},
-  cardTitle: {
-    paddingTop: 16,
-    paddingBottom: 16,
-  },
-  cardTitleText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  cardContent: {
-    flexDirection: 'row',
-  },
-  cardContentImage: {
-    width: 160,
-    height: 160,
-    padding: 16,
-    backgroundColor: '#dfe6e9',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardContentInfo: {
-    flex: 1,
-    padding: 16,
-    justifyContent: 'space-between',
-  },
-  cardImageBox: {},
-  cardRemoveIcon: {
-    backgroundColor: '#e74c3c',
-    alignItems: 'center',
-    padding: 4,
-  },
-  cardContentImageText: {
-    marginTop: 16,
-  },
-  baseInput: {
-    borderWidth: 1,
-    borderColor: 'black',
-  },
-  inputButtonBox: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-});
 
 export default MenuCard;

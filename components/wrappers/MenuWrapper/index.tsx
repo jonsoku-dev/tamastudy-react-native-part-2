@@ -1,13 +1,32 @@
-import React, { FunctionComponent } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import React, { FunctionComponent, useState } from 'react';
 import { useBoardContext } from '../../../contexts/useBoardContext';
 import MenuCard from '../../cards/MenuCard';
-import getDate from '../../../utils/getDate';
+import styled from '@emotion/native';
+import StatusCard from '../../cards/StatusCard';
+import { IBoard } from '../../../interfaces/IBoard';
 
-interface Props {}
+interface Props {
+}
+
+const Wrapper = styled.View`
+`;
+
+const MenuBlock = styled.View`
+  margin: 40px 0;
+`;
 
 const MenuWrapper: FunctionComponent<Props> = () => {
   const { boards, findBoardsByDate, currentDate } = useBoardContext();
+
+  const [currentTotalCalorie, setCurrentTotalCalorie] = useState(0)
+
+  const getCurrentTotalCalories = (boards: IBoard[]) => {
+    let ca = 0;
+    boards.forEach(board => {
+      ca += board.calorie ?? 0;
+    });
+    setCurrentTotalCalorie(ca)
+  };
 
   React.useEffect(() => {
     findBoardsByDate(currentDate);
@@ -20,9 +39,20 @@ const MenuWrapper: FunctionComponent<Props> = () => {
   const lunch = boards.find((board) => board.type === 'lunch');
   const dinner = boards.find((board) => board.type === 'dinner');
 
+  React.useEffect(() => {
+    getCurrentTotalCalories(boards);
+  }, [boards]);
+
   return (
-    <View>
-      <View>
+    <Wrapper>
+      <StatusCard
+        totalKcal={3000}
+        currentKcal={currentTotalCalorie}
+        checkMorning={!!morning}
+        checkLunch={!!lunch}
+        checkDinner={!!dinner}
+      />
+      <MenuBlock>
         <MenuCard
           title={morning?.title ?? '타이틀을 입력해주세요.'}
           type={morning?.type ?? 'morning'}
@@ -30,8 +60,8 @@ const MenuWrapper: FunctionComponent<Props> = () => {
           image={morning?.image}
           date={morning?.date}
         />
-      </View>
-      <View>
+      </MenuBlock>
+      <MenuBlock>
         <MenuCard
           title={lunch?.title ?? '타이틀을 입력해주세요. '}
           type={lunch?.type ?? 'lunch'}
@@ -39,8 +69,8 @@ const MenuWrapper: FunctionComponent<Props> = () => {
           image={lunch?.image}
           date={lunch?.date}
         />
-      </View>
-      <View>
+      </MenuBlock>
+      <MenuBlock>
         <MenuCard
           title={dinner?.title ?? '타이틀을 입력해주세요. '}
           type={dinner?.type ?? 'dinner'}
@@ -48,11 +78,9 @@ const MenuWrapper: FunctionComponent<Props> = () => {
           image={dinner?.image}
           date={dinner?.date}
         />
-      </View>
-    </View>
+      </MenuBlock>
+    </Wrapper>
   );
 };
-
-StyleSheet.create({});
 
 export default MenuWrapper;
